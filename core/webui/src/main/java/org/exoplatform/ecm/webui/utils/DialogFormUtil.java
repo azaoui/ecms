@@ -16,21 +16,6 @@
  */
 package org.exoplatform.ecm.webui.utils;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Property;
-import javax.jcr.PropertyType;
-
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.ecm.utils.text.Text;
 import org.exoplatform.ecm.webui.form.UIDialogForm;
@@ -59,6 +44,20 @@ import org.exoplatform.webui.form.validator.MandatoryValidator;
 import org.exoplatform.webui.form.validator.NullFieldValidator;
 import org.exoplatform.webui.form.validator.NumberFormatValidator;
 import org.exoplatform.webui.form.validator.StringLengthValidator;
+
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
+import javax.jcr.PropertyType;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /*
  * Created by The eXo Platform SAS
@@ -203,12 +202,11 @@ public class DialogFormUtil {
               boolean isEmpty = Utils.isEmptyContent(inputValue);
               if(isEmpty) inputValue = "";
               else if(option == null || option.indexOf(SANITIZATION_FLAG) < 0) inputValue = org.exoplatform.services.deployment.Utils.sanitize(inputValue);
-              if (input.getName().equals("name") && input.getAncestorOfType(UIDialogForm.class).isAddNew()) {
+              if (input.getName().equals("name") && input.getAncestorOfType(UIDialogForm.class).isAddNew() && properties.get("title") == null) {
                 JcrInputProperty jcrExoTitle = new JcrInputProperty();
                 jcrExoTitle.setJcrPath("/node/exo:title");
                 jcrExoTitle.setValue(inputValue);
                 properties.put("/node/exo:title", jcrExoTitle);
-                inputValue = Utils.cleanString(inputValue);
               }
               property.setValue(inputValue);
             } else {

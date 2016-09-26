@@ -121,7 +121,12 @@
     <dependency>
       <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.webui.portlet</artifactId>
-    </dependency>    
+    </dependency>
+    <dependency>
+       <groupId>junit</groupId>
+       <artifactId>junit</artifactId>
+       <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
