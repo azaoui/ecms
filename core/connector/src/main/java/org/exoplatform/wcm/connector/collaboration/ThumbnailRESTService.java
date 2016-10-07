@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.imageio.ImageIO;
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.Session;
@@ -34,7 +35,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
 
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.ecm.utils.text.Text;
@@ -285,6 +288,68 @@ public class ThumbnailRESTService implements ResourceContainer {
       }
     }
     return Response.ok().header(LAST_MODIFIED_PROPERTY, dateFormat.format(new Date())).build();
+  }
+
+  /**
+   * Returns an image size.
+   *
+   * @param repoName The repository name.
+   * @param workspaceName The workspace name.
+   * @param nodePath The node path.
+   * @return Response json.
+   * @throws Exception
+   */
+  @Path("/imagesize/{repoName}/{workspaceName}/{nodePath:.*}/")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getImageSize(@PathParam("repoName") String repoName,
+                               @PathParam("workspaceName") String workspaceName,
+                               @PathParam("nodePath") String nodePath) throws Exception {
+
+    Node showingNode = getShowingNode(workspaceName, getNodePath(nodePath));
+    Node targetNode = getTargetNode(showingNode);
+    Node content = targetNode.getNode("jcr:content");
+    if (targetNode.isNodeType("nt:file")) {
+      BufferedImage image = theBufferedImage(content, targetNode.getPath());
+      ImageSize img = new ImageSize(image.getHeight(), image.getWidth());
+
+      image.getHeight();
+      image.getWidth();
+      return Response.ok(img, MediaType.APPLICATION_JSON).build();
+    }
+
+    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+  }
+
+  public static class ImageSize {
+    public ImageSize(int height, int width) {
+      this.height = height;
+      this.width = width;
+    }
+
+    private int height;
+
+    private int width;
+
+    public int getHeight() {
+      return height;
+    }
+
+    public void setHeight(int height) {
+      this.height = height;
+    }
+
+    public int getWidth() {
+      return width;
+    }
+
+    public void setWidth(int width) {
+      this.width = width;
+    }
+  }
+
+  public BufferedImage theBufferedImage(Node contentNode, String nodePath) throws Exception {
+    return ImageIO.read(contentNode.getProperty("jcr:data").getStream());
   }
 
   private Response getThumbnailByType(String workspaceName, String nodePath,
